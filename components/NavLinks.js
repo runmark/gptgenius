@@ -13,7 +13,7 @@ const NavLinks = () => {
         <ul className="menu text-base-content">
             {links.map((link) => {
                 return (
-                    <li key={link.hred}>
+                    <li key={link.href}>
                         <Link href={link.href} className="capitalize">{link.label}</Link>
                     </li>
                 );
