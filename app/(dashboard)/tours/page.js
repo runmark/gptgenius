@@ -1,7 +1,10 @@
 const ToursPage = () => {
     return (
         <div>
-            Enter
+            <form>
+                <input type="text" ></input>
+                <button type="submit">reset</button>
+            </form>
         </div>
     );
 }
