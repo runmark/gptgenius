@@ -1,8 +1,9 @@
-const TourInfo = () => {
+const TourInfo = ({ tour }) => {
+
     return (
-        <div>
-            Enter
-        </div>
+        <p>
+            "beautify"
+        </p>
     );
 }
 

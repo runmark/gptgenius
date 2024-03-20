@@ -10,10 +10,11 @@ const NewTour = () => {
     const { mutate, isPending, data: tour } = useMutation({
         mutationFn: async (destination) => {
             const newTour = await generateTourResponse(destination);
-            if (newTour) return newTour;
+            if (newTour) {
+                return newTour;
+            }
 
             toast.error('no matching city found...');
-            return;
         },
     });
 
@@ -21,7 +22,7 @@ const NewTour = () => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const destination = Object.fromEntries(formData.entries());
-        console.log(destination);
+        // console.log("---------: ", destination);
 
         mutate(destination);
     };
@@ -31,7 +32,7 @@ const NewTour = () => {
     }
 
     return (
-        <div>
+        <>
             <form onSubmit={handleSubmit} className="max-w-2xl">
                 <h2 className="mb-4">Select your dream destination</h2>
                 <div className="join w-full">
@@ -43,14 +44,18 @@ const NewTour = () => {
                         className="input input-bordered join-item w-full"
                         required
                     ></input>
-                    <button type="submit" className="button btn-primary join-item">generate tour</button>
+                    <button type="submit" className="button btn-primary join-item" disabled={isPending}>
+                        {isPending ? 'please wait...' : 'generate tour'}
+                    </button>
                 </div>
             </form>
 
             <div className="mt-16">
-                <TourInfo />
+                <div className="mt-16">
+                    {tour ? <TourInfo tour={tour} /> : null}
+                </div>
             </div>
-        </div>
+        </>
     );
 }
 
