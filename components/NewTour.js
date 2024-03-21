@@ -18,7 +18,7 @@ const NewTour = () => {
 
             const newTour = await generateTourResponse(destination);
             if (newTour) {
-                // console.log("in client: ", newTour);
+                console.log("shouldn't reach here!!", newTour);
                 await createNewTour(newTour);
                 queryClient.invalidateQueries({ queryKey: ['tours'] });
                 return newTour;
@@ -44,7 +44,7 @@ const NewTour = () => {
     return (
         <>
             <form onSubmit={handleSubmit} className="max-w-2xl">
-                <h2 className="mb-4">Select your dream destination</h2>
+                <h2 className="mb-4">Input your dream destination</h2>
                 <div className="join w-full">
                     <input type="text" placeholder="city" name="city"
                         className="input input-bordered join-item w-full"

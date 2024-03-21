@@ -31,6 +31,10 @@ export const generateChatResponse = async (chatMessages) => {
 };
 
 export const getExistingTour = async ({ city, country }) => {
+
+    city = city.toUpperCase();
+    country = country.toUpperCase();
+
     return prisma.tour.findUnique({
         where: {
             city_country: {
@@ -87,4 +91,46 @@ export const createNewTour = async (tour) => {
     return prisma.tour.create({
         data: tour,
     });
-}
+};
+
+export const getAllTours = async (searchTerm) => {
+
+    if (!searchTerm) {
+        const tours = await prisma.tour.findMany({
+            orderBy: {
+                city: "asc",
+            },
+        });
+        return tours;
+    }
+
+    const tours = await prisma.tour.findMany({
+        orderBy: {
+            city: "asc",
+        },
+        where: {
+            OR: [
+                {
+                    city: {
+                        contains: searchTerm,
+                    },
+                },
+                {
+                    country: {
+                        contains: searchTerm,
+                    },
+                },
+            ],
+        },
+    });
+
+    return tours;
+};
+
+export const getTourById = async (id) => {
+    return prisma.tour.findUnique({
+        where: {
+            id,
+        },
+    });
+};
