@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const ToursCard = ({ tour }) => {
 
-    const { id, city, country, title } = tour;
+    const { id, city, country } = tour;
 
     return (
         <Link href={`/tours/${id}`} className="card card-compact rounded-xl bg-base-100">
