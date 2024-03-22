@@ -86,6 +86,23 @@ export const generateTourResponse = async ({ city, country }) => {
     }
 };
 
+export const generateTourImage = async ({ city, country }) => {
+
+    try {
+        const tourImage = await openai.images.generate({
+            prompt: `a panoramic view of the ${city} ${country}`,
+            n: 1,
+            size: '512x512',
+        });
+        console.log("tourImage: ", tourImage);
+        return tourImage?.data[0]?.url;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+};
+
+
 export const createNewTour = async (tour) => {
     // console.log("in createNewTour action: ", tour);
     return prisma.tour.create({
