@@ -2,6 +2,7 @@
 
 import OpenAI from 'openai';
 import prisma from './db';
+import { revalidatePath } from 'next/cache';
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -20,6 +21,7 @@ export const generateChatResponse = async (chatMessages) => {
             ],
             model: 'gpt-3.5-turbo',
             temperature: 0,
+            max_tokens: 100,
         });
 
         // console.log(response.choices[0].message);
@@ -68,6 +70,7 @@ export const generateTourResponse = async ({ city, country }) => {
             ],
             model: 'gpt-3.5-turbo',
             temperature: 0,
+            max_tokens: 100,
         });
 
         // console.log(query);
@@ -80,7 +83,7 @@ export const generateTourResponse = async ({ city, country }) => {
         }
 
         console.log(tourData.tour);
-        return tourData.tour;
+        return { tour: tourData.tour, tokens: response.usage.total_tokens };
     } catch (error) {
         console.log(error);
     }
@@ -93,6 +96,7 @@ export const generateTourImage = async ({ city, country }) => {
             prompt: `a panoramic view of the ${city} ${country}`,
             n: 1,
             size: '512x512',
+            max_tokens: 500,
         });
         console.log("tourImage: ", tourImage);
         return tourImage?.data[0]?.url;
@@ -104,7 +108,7 @@ export const generateTourImage = async ({ city, country }) => {
 
 
 export const createNewTour = async (tour) => {
-    // console.log("in createNewTour action: ", tour);
+    console.log("in createNewTour action: ", tour);
     return prisma.tour.create({
         data: tour,
     });
@@ -150,4 +154,51 @@ export const getTourById = async (id) => {
             id,
         },
     });
+};
+
+export const fetchUserTokensById = async (clerkId) => {
+    console.log("fetchUserTokensById: ", clerkId);
+    const result = await prisma.token.findUnique({
+        where: {
+            clerkId,
+        },
+    });
+    console.log("fetchUserTokensById result: ", result);
+    return result?.tokens;
+};
+
+export const generateUserTokensForId = async (clerkId) => {
+    const result = await prisma.token.create({
+        data: {
+            clerkId,
+        },
+    });
+    return result?.tokens;
+};
+
+export const fetchOrGenerateTokens = async (clerkId) => {
+    console.log("fetchOrGenerateTokens clerkId: ", clerkId);
+    const result = await fetchUserTokensById(clerkId);
+    console.log("fetchOrGenerateTokens result: ", result);
+    if (result) {
+        return result;
+    }
+    return (await generateUserTokensForId(clerkId));
+};
+
+export const substractTokens = async (tokens, clerkId) => {
+    console.log("substractTokens: ", tokens, clerkId);
+    const result = await prisma.token.update({
+        where: {
+            clerkId,
+        },
+        data: {
+            tokens: {
+                decrement: tokens,
+            },
+        },
+    });
+
+    revalidatePath('/profile');
+    return result.tokens;
 };
